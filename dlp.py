@@ -96,7 +96,7 @@ class Dlp(Process):
                     'file': os.path.join(self.folder_path, os.path.basename(ydl.prepare_filename(info))) if download else None
                 }
         except Exception as e:
-            logger.error(f"Error extracting file: {URL}, {str(e)}")
+            logger.error(f"Error extracting file: {URL}, {str(e)}, {ppt} attempts left")
             if ppt > 0:
                 ppt -= 1
                 sleep(1)
