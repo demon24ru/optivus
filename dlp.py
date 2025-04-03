@@ -56,24 +56,22 @@ class Dlp(Process):
                 except Exception as e:
                     result.append({'error': str(e), 'url': url})
 
-            # Create result data
-            processed_data = {
-                **data,
-                'data': result
-            }
-
             # Check if this is a pipeline task
             if 'task_id' in data:
                 # This is a task from ResultQueue, report back
                 self.qres.put({
                     'action': 'download_complete',
                     'task_id': data['task_id'],
+                    'part_name': 'dlp',
                     'item_index': data.get('item_index', 0),  # Include the item index
                     'result': result
                 })
             else:
                 # Regular task, send result to user
-                self.qsio.put(processed_data)
+                self.qsio.put({
+                    **data,
+                    'data': result
+                })
 
     def extract_file(self, URL, download=False, ppt=2):
         try:

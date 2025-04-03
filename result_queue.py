@@ -27,7 +27,7 @@ class ResultQueue(Process):
             self.tasks[task_id] = {
                 'original_data': data,
                 'parts': {},
-                'expected_parts': expected_parts or ['audio', 'video'],
+                'expected_parts': expected_parts or ['audio', 'video', 'dlp'],
                 'complete': False,
                 'sid': sid,
                 'timestamp': time.time(),
@@ -106,20 +106,19 @@ class ResultQueue(Process):
             else:
                 # This is a result from a handler
                 action = data.get('action')
+                # A part of a task has been completed
+                task_id = data.get('task_id')
+                part_name = data.get('part_name')
+                result = data.get('result')
+                item_index = data.get('item_index')
                 
                 if action == 'download_complete':
                     # A file has been downloaded, process it immediately
                     self._handle_single_download_complete(data)
+                    self.add_part(task_id, part_name, result[0], item_index)
                 elif action == 'add_part':
                     # A part of a task has been completed
-                    task_id = data['task_id']
-                    part_name = data['part_name']
-                    result = data['result']
-                    item_index = data.get('item_index')
-                    
-                    is_complete = self.add_part(task_id, part_name, result, item_index)
-                    
-                    if is_complete:
+                    if self.add_part(task_id, part_name, result, item_index):
                         # All parts are complete, send the final result to the user
                         self._handle_task_complete(task_id)
     
@@ -136,7 +135,7 @@ class ResultQueue(Process):
             task_id, 
             data, 
             data['sid'], 
-            ['audio', 'video']
+            ['audio', 'video', 'dlp']
         )
         
         # Set the total count of items to process
@@ -184,13 +183,18 @@ class ResultQueue(Process):
                     error_msg = download_result['error']
                     logger.warning(f"Download error: {error_msg}")
                     
+                    self.add_part(task_id, 'dlp', {
+                        'error': f"Download failed: {error_msg}"
+                    }, item_index)
                     # Add error results to both audio and video parts
                     self.add_part(task_id, 'audio', {
                         'text': '',
                         'chunks': [],
                         'error': f"Download failed: {error_msg}"
                     }, item_index)
-                    self.add_part(task_id, 'video', {'error': f"Download failed: {error_msg}"}, item_index)
+                    self.add_part(task_id, 'video', {
+                        'error': f"Download failed: {error_msg}"
+                    }, item_index)
                     
                     # Increment processed count to maintain proper tracking
                     with self.lock:
@@ -299,5 +303,7 @@ class ResultQueue(Process):
             merged_item['transcribe_audio'] = parts['audio']
         if 'video' in parts:
             merged_item['transcribe_video'] = parts['video']
+        if 'dlp' in parts:
+            merged_item['info'] = parts['dlp']
             
         return merged_item
