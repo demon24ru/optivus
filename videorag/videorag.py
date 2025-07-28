@@ -121,8 +121,9 @@ class VideoRAG:
     def load_caption_model(self, debug=False):
         # caption model
         if not debug:
-            self.caption_model = AutoModel.from_pretrained('./MiniCPM-V-2_6-int4', trust_remote_code=True)
-            self.caption_tokenizer = AutoTokenizer.from_pretrained('./MiniCPM-V-2_6-int4', trust_remote_code=True)
+            model_path = os.path.join("./", "LLM", 'MiniCPM-V-2_6-int4')
+            self.caption_model = AutoModel.from_pretrained(model_path, trust_remote_code=True)
+            self.caption_tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
             self.caption_model.eval()
         else:
             self.caption_model = None

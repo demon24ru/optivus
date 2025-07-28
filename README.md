@@ -469,17 +469,10 @@ Your final directory structure after downloading all checkpoints should look lik
 ```shell
 VideoRAG/
 ├── .checkpoints/
-├── faster-distil-whisper-large-v3/
 ├── ImageBind/
-├── LICENSE
-├── longervideos/
 ├── MiniCPM-V-2_6-int4/
 ├── README.md
-├── reproduce/
-├── notesbooks/
-├── videorag/
-├── VideoRAG_cover.png
-└── VideoRAG.png
+└──videorag/
 ```
 
 ## 🚀 Quick Start
