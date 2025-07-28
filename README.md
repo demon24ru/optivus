@@ -470,7 +470,6 @@ Your final directory structure after downloading all checkpoints should look lik
 VideoRAG/
 ├── .checkpoints/
 ├── ImageBind/
-├── MiniCPM-V-2_6-int4/
 ├── README.md
 └──videorag/
 ```
