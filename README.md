@@ -455,9 +455,6 @@ git lfs install
 # Download MiniCPM-V model
 git lfs clone https://huggingface.co/openbmb/MiniCPM-V-2_6-int4
 
-# Download Whisper model
-git lfs clone https://huggingface.co/Systran/faster-distil-whisper-large-v3
-
 # Download ImageBind checkpoint
 mkdir .checkpoints
 cd .checkpoints
