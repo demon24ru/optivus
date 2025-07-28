@@ -147,6 +147,7 @@ dist
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
+videorag/__pycache__/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -329,3 +330,5 @@ test_img
 fs_audio
 content
 test
+test_longervideos
+videorag-workdir

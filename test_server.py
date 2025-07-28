@@ -8,17 +8,19 @@ async def main():
         await sio.emit('message', {
             # 'type': 'dlp',
             # 'data_type': 'file',
-            # 'type': 'flrnc',
-            # 'file': './test_video/1743175740_5J8Ej0tv90k.mp4',
-            'v_conv': True,
+            # 'type': 'video',
+            'type': 'whisp',
+            'file': './test_video/youtube__ChZ0Q2Q58E_audio.mp3',
+            # 'v_conv': True,
             'id': 123456,
-            'urls': [
-                'https://www.youtube.com/shorts/5J8Ej0tv90k',
+            # 'urls': [
+            #     'https://www.youtube.com/shorts/5J8Ej0tv90k',
             #     'https://www.youtube.com/shorts/gutZtqv1ghU',
             #     'https://www.youtube.com/shorts/YegGIxkGUSY',
                 # 'https://www.youtube.com/shorts/oHR-zDVJhuE',
                 # 'https://www.tiktok.com/@shoelover99/video/7441259401496792363'
-            ],
+            # ],
+
             # 'type': 'fish',
             # 'reference_audio': './fs_audio/tts_1743416383.wav',
             # 'reference_text': 'Раз, два, три, четыре, пять. Вышел зайчик погулять. И не просто вышел сам, а пришел парам пам пам.',

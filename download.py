@@ -16,8 +16,6 @@ def download_model(hg_model):
 
 
 if __name__ == '__main__':
-    # hg_model = 'MiaoshouAI/Florence-2-large-PromptGen-v2.0'
-    # hg_model = 'MiaoshouAI/Florence-2-base-PromptGen-v2.0'
     # hg_model = 'openai/whisper-base'
     # hg_model = 'openai/whisper-small'
     hg_model = 'distilbert/distilbert-base-multilingual-cased'

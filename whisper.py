@@ -3,7 +3,6 @@ from multiprocessing import Process, Queue
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 from download import download_model
 import torch
-import ffmpeg
 from loguru import logger
 
 
@@ -101,33 +100,34 @@ class Whisper(Process):
 
     def _handle_result(self, data, result):
         """Handle a single result"""
+        # Regular task, send result to user
+        self.qsio.put({
+            **data,
+            'transcribe_audio': result,
+        })
+    
+    def _handle_batch_result(self, data, batch_results):
+        """Handle a batch of results"""
+        result = [
+                    {**data['data'][i], 'transcribe_audio': batch_results[i]}
+                        for i in range(len(data['data']))
+                    ]
         # Check if this is a pipeline task
         if 'task_id' in data:
             # Report back to ResultQueue
             self.qres.put({
-                'action': 'add_part',
+                'action': 'transcribe_audio',
                 'task_id': data['task_id'],
                 'part_name': 'audio',
-                'item_index': data.get('item_index', 0),  # Include the item index if present
+                'item_index': data.get('item_index', 0),  # Include the item index
                 'result': result
             })
         else:
             # Regular task, send result to user
             self.qsio.put({
                 **data,
-                'transcribe_audio': result,
-            })
-    
-    def _handle_batch_result(self, data, batch_results):
-        """Handle a batch of results"""
-        # Regular task, send result to user
-        self.qsio.put({
-            **data,
-            'data': [
-                {**data['data'][i], 'transcribe_audio': batch_results[i]} 
-                    for i in range(len(data['data']))
-                ]
-            })
+                'data': result
+                })
 
     def transcribe(self, data_buf):
         audioPaths = self._pre_transcribe(data_buf)
@@ -164,7 +164,6 @@ class Whisper(Process):
         return result
 
     def _pre_transcribe(self, data_buf):
-        video_types = ['mp4']
         audio_types = ['mp3', 'wav']
         audioPaths = []
         for data in data_buf:
@@ -176,23 +175,6 @@ class Whisper(Process):
                             "file": file,
                             "error": None
                             })
-                    elif file.split(".")[-1] in video_types:
-                        videoPath = file
-                        audioPath = file.rsplit(".", 1)[0] + ".wav"
-
-                        try:
-                            ffmpeg.input(videoPath).output(audioPath, q='0', map='a', y=None, loglevel='quiet').run()
-                        except Exception as e:
-                            logger.warning(f"Error extracting audio: {e}")
-                            audioPaths.append({
-                                "file": None,
-                                "error": f"Error extracting audio: {e}"
-                            })
-                            continue
-                        audioPaths.append({
-                            "file": audioPath,
-                            "error": None
-                        })
         
         return audioPaths
 

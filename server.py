@@ -3,7 +3,7 @@ import socketio
 from multiprocessing import Queue
 from queue import Empty
 from whisper import Whisper
-from florence import Florence
+from videorag import VideoRAG
 from fish_sp import FishSpeech
 from dlp import Dlp
 from result_queue import ResultQueue
@@ -22,7 +22,7 @@ qres = Queue()
 
 # Initialize the components
 whisp_cls = Whisper(qsio, qwhisp, qres)
-flrnc_cls = Florence(qsio, qflrnc, qres)
+videorag_cls = VideoRAG(qsio, qflrnc, qres)
 dlp_cls = Dlp(qsio, qdlp, qres)
 result_queue = ResultQueue(qsio, qres, qdlp, qwhisp, qflrnc)  # Pass all necessary queues
 fish_speech_cls = FishSpeech(qsio)
@@ -58,8 +58,6 @@ async def message(sid, data):
         fish_speech_cls.put(data, sid)
     elif tp == 'whisp':
         whisp_cls.put_with_sid(data, sid)
-    elif tp == 'flrnc':
-        flrnc_cls.put_with_sid(data, sid)
     elif tp == 'video':
         # Mark as pipeline task and send to ResultQueue
         data['v_conv'] = True
@@ -87,7 +85,7 @@ async def init_app():
     sio.start_background_task(background_task)
     result_queue.start()
     whisp_cls.start()
-    flrnc_cls.start()
+    videorag_cls.start()
     dlp_cls.start()
     fish_speech_cls.start()
     return app
