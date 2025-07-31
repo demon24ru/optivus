@@ -6,7 +6,7 @@ import torch
 import ffmpeg
 
 PATH_FOLDER = "./test_lightrag"
-MODEL = "openai/whisper-medium"
+MODEL = "openai/whisper-large-v2"
 
 if __name__ == '__main__':
     model_name = MODEL.rsplit('/', 1)[-1]
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         quit(1)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
+    torch_dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float16
     print("device =>", device)
     # Load Whisper model
     model = AutoModelForSpeechSeq2Seq.from_pretrained(

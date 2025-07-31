@@ -4,7 +4,7 @@ ARG TARGETARCH
 
 ARG FISH_MODEL=fish-speech-1.5
 ARG MINICPM_MODEL=MiniCPM-V-2_6-int4
-ARG WHISPER_MODEL=whisper-medium
+ARG WHISPER_MODEL=whisper-large-v2
 ARG HF_ENDPOINT=https://huggingface.co
 
 WORKDIR /opt/app

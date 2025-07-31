@@ -37,7 +37,7 @@ class Whisper(Process):
             download_model(hg_model)
 
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        torch_dtype = torch.float16
+        torch_dtype = torch.bfloat16
         logger.info(f"{self.__class__.__name__} device => {device}")
 
         # Load Whisper model
