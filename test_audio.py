@@ -87,13 +87,18 @@ if __name__ == '__main__':
                 print("Error: Could not extract audio from the video.")
                 quit(1)
 
+            transcribePath = os.path.join(folder, f"{filename}.txt")
+            if os.path.exists(transcribePath):
+                print(f'{audioPath} transcribe already exist!')
+                return
+
             start_time = time.time()
             print(f'{audioPath} transcribe...')
             result = run_example(audioPath)
             elapsed_time = time.time() - start_time
             print(f'{file} {str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
 
-            with open(os.path.join(folder, f"{filename}.txt"), "w", encoding='utf-8') as f:
+            with open(transcribePath, "w", encoding='utf-8') as f:
                 for r in result:
                     # print(f'{str(datetime.timedelta(seconds=r["start"]))}\n{r["text"]}')
                     f.write(f'{r["text"]}\n')
