@@ -18,5 +18,5 @@ def download_model(hg_model):
 if __name__ == '__main__':
     # hg_model = 'openai/whisper-base'
     # hg_model = 'openai/whisper-small'
-    hg_model = 'distilbert/distilbert-base-multilingual-cased'
+    hg_model = 'openai/whisper-medium'
     download_model(hg_model)

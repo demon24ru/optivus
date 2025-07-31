@@ -6,7 +6,7 @@ import torch
 import ffmpeg
 
 PATH_FOLDER = "./test_lightrag"
-MODEL = "openai/whisper-small"
+MODEL = "openai/whisper-medium"
 
 if __name__ == '__main__':
     model_name = MODEL.rsplit('/', 1)[-1]
@@ -17,7 +17,7 @@ if __name__ == '__main__':
         quit(1)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    torch_dtype = torch.float32 if torch.cuda.is_available() else torch.float32
+    torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
     print("device =>", device)
     # Load Whisper model
     model = AutoModelForSpeechSeq2Seq.from_pretrained(
@@ -88,6 +88,7 @@ if __name__ == '__main__':
                 quit(1)
 
             start_time = time.time()
+            print(f'{audioPath} transcribe...')
             result = run_example(audioPath)
             elapsed_time = time.time() - start_time
             print(f'{file} {str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
@@ -97,7 +98,7 @@ if __name__ == '__main__':
                     # print(f'{str(datetime.timedelta(seconds=r["start"]))}\n{r["text"]}')
                     f.write(f'{r["text"]}\n')
         else:
-            print(f'{file} Error: not support!')
+            print(f'{os.path.join(folder, file)} Error: not support!')
 
     def worker(path):
         for elem in os.listdir(path):
