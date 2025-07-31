@@ -5,10 +5,11 @@ from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 import torch
 import ffmpeg
 
+PATH_FOLDER = "./test_lightrag"
+MODEL = "openai/whisper-small"
 
 if __name__ == '__main__':
-    hg_model = "openai/whisper-small"
-    model_name = hg_model.rsplit('/', 1)[-1]
+    model_name = MODEL.rsplit('/', 1)[-1]
     model_path = os.path.join("./", "LLM", model_name)
 
     if not os.path.exists(model_path):
@@ -56,30 +57,31 @@ if __name__ == '__main__':
                 } for item in audioTranscription['chunks']
             ]
 
-    folder_path = "./test_video"
-    if not os.path.exists(folder_path):
-        print(f'No folder {folder_path}!!!')
+
+    if not os.path.exists(PATH_FOLDER):
+        print(f'No folder {PATH_FOLDER}!!!')
         quit(1)
 
-    if len(os.listdir(folder_path)) > 1:
-        start_time = time.time()
-        result = run_example([os.path.join(folder_path, item) for item in os.listdir(folder_path)])
-        elapsed_time = time.time() - start_time
-        print(f'{str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
-        print(result)
-        quit(0)
+    # if len(os.listdir(PATH_FOLDER)) > 1:
+    #     start_time = time.time()
+    #     result = run_example([os.path.join(PATH_FOLDER, item) for item in os.listdir(PATH_FOLDER)])
+    #     elapsed_time = time.time() - start_time
+    #     print(f'{str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
+    #     print(result)
+    #     quit(0)
 
-    for filename in os.listdir(folder_path):
-        video_types = ['mp4', 'mp3', 'wav']
+    def transcribe(file, folder):
         audio_types = ['mp3', 'wav']
-        if filename.split(".")[-1] in video_types:
-            if filename.split(".")[-1] in audio_types:
-                audioPath = os.path.join(folder_path, filename)
+        support_types = ['mp4'] + audio_types
+        filename = file.split(".")[0]
+        extension = file.split(".")[-1]
+        if extension in support_types:
+            if extension in audio_types:
+                audioPath = os.path.join(folder, file)
             else:
-                videoPath = os.path.join(folder_path, filename)
-                audioPath = os.path.join(folder_path, filename.split(".")[0] + ".wav")
+                audioPath = os.path.join(folder, f"{filename}.wav")
 
-                ffmpeg.input(videoPath).output(audioPath, q='0', map='a', y=None, loglevel='quiet').run()
+                ffmpeg.input(os.path.join(folder, file)).output(audioPath, q='0', map='a', y=None, loglevel='quiet').run()
 
             if not os.path.exists(audioPath):
                 print("Error: Could not extract audio from the video.")
@@ -88,7 +90,21 @@ if __name__ == '__main__':
             start_time = time.time()
             result = run_example(audioPath)
             elapsed_time = time.time() - start_time
-            print(f'{filename} {str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
-            for r in result:
-                # print(f'{str(datetime.timedelta(seconds=r["start"]))}\n{r["text"]}')
-                print(f'{r["text"]}')
+            print(f'{file} {str(datetime.timedelta(seconds=elapsed_time))} seconds to complete.')
+
+            with open(os.path.join(folder, f"{filename}.txt"), "w", encoding='utf-8') as f:
+                for r in result:
+                    # print(f'{str(datetime.timedelta(seconds=r["start"]))}\n{r["text"]}')
+                    f.write(f'{r["text"]}\n')
+        else:
+            print(f'{file} Error: not support!')
+
+    def worker(path):
+        for elem in os.listdir(path):
+            path_el = os.path.join(path, elem)
+            if os.path.isfile(path_el):
+                transcribe(elem, path)
+            elif os.path.isdir(path_el):
+                worker(path_el)
+
+    worker(PATH_FOLDER)
