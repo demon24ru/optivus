@@ -29,7 +29,7 @@ class Whisper(Process):
         self.queue.put({**data, 'sid': sid})
 
     def load_model(self):
-        hg_model = os.getenv('AI_WHISPER_MODEL', 'openai/whisper-base')
+        hg_model = os.getenv('AI_WHISPER_MODEL', 'openai/whisper-large-v2')
         model_name = hg_model.rsplit('/', 1)[-1]
         model_path = os.path.join("./", "LLM", model_name)
 
