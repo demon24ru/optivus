@@ -21,10 +21,10 @@ class VideoRAG(Process):
         self.daemon = True
 
         os.environ["CUDA_VISIBLE_DEVICES"] = os.getenv('AI_VISIBLE_DEVICES', '0')
-        os.environ["OPENAI_API_KEY"] = os.getenv('OPENAI_API_KEY', '')
-        os.environ["OPENAI_BASE_URL"] = os.getenv('OPENAI_BASE_URL', 'https://openrouter.ai/api/v1')
+        os.environ["OPENAI_API_KEY"] = os.getenv('AI_OPENAI_API_KEY', '')
+        os.environ["OPENAI_BASE_URL"] = os.getenv('AI_OPENAI_HOST', 'https://openrouter.ai/api/v1')
         # set OLLAMA_HOST or pass in host="http://127.0.0.1:11434"
-        os.environ["OLLAMA_HOST"] = os.getenv('AI_OLLAMA_HOST', 'http://ollama:11434')
+        os.environ["OLLAMA_HOST"] = os.getenv('AI_OLLAMA_EMBEDDING_HOST', 'http://ollama:11434')
         self.llm_config = LLMConfig(
             # embedding_func_raw=openai_embedding,
             # embedding_model_name="text-embedding-3-small",
@@ -33,7 +33,7 @@ class VideoRAG(Process):
             # embedding_batch_num=32,
             # embedding_func_max_async=16,
             embedding_func_raw=ollama_embedding,
-            embedding_model_name="bge-m3:latest",
+            embedding_model_name=os.getenv('AI_OLLAMA_EMBEDDING_MODEL', 'bge-m3:latest'),
             embedding_dim=1024,
             embedding_max_token_size=8192,
             embedding_batch_num=10,
@@ -43,12 +43,12 @@ class VideoRAG(Process):
 
             # LLM (we utilize gpt-4o-mini for all experiments)
             best_model_func_raw=gpt_4o_mini_complete,
-            best_model_name="gpt-4o-mini",
+            best_model_name=os.getenv('AI_OPENAI_BEST_MODEL', 'openai/o3-mini'),
             best_model_max_token_size=32768,
             best_model_max_async=16,
 
             cheap_model_func_raw=gpt_4o_mini_complete,
-            cheap_model_name="gpt-4o-mini",
+            cheap_model_name=os.getenv('AI_OPENAI_CHEAP_MODEL', 'openai/o3-mini'),
             cheap_model_max_token_size=32768,
             cheap_model_max_async=16
         )
