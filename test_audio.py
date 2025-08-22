@@ -73,13 +73,13 @@ if __name__ == '__main__':
     def transcribe(file, folder):
         audio_types = ['mp3', 'wav']
         support_types = ['mp4'] + audio_types
-        filename = file.split(".")[0]
+        filename = file.rsplit(".", 1)[0]
         extension = file.split(".")[-1]
         if extension in support_types:
             if extension in audio_types:
                 audioPath = os.path.join(folder, file)
             else:
-                audioPath = os.path.join(folder, f"{filename}.wav")
+                audioPath = os.path.join(folder, f"{filename}.mp3")
 
                 ffmpeg.input(os.path.join(folder, file)).output(audioPath, q='0', map='a', y=None, loglevel='quiet').run()
 
